@@ -10,7 +10,7 @@ import java.net.Socket;
 public class ClientHandler {
     Server server;
 
-    public ClientHandler(String[] reservations) {
+    public ClientHandler(Server server) {
         this.server = server;
     }
 
@@ -54,11 +54,13 @@ public class ClientHandler {
     }
 
     private String handleReserveRequest(String name, int count) {
+        this.server.getServerHandler().requestCriticalSection();
         // wait to acquire CS
         // output_msg = update reservations
         // release
         // send reservations to all
         // send output_msg to client
+
         return null;
     }
 

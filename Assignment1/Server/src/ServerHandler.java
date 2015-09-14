@@ -27,7 +27,7 @@ public class ServerHandler {
         this.serverAvailability = new boolean[numOfServers]; // defaults to false
     }
 
-    private void requestCriticalSection() {
+    public void requestCriticalSection() {
         // update queue
         queue[serverId] = vectorClock[serverId];
 
