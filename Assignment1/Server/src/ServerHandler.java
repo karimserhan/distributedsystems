@@ -60,7 +60,22 @@ public class ServerHandler {
                             outToServer.println(message);
                             outToServer.flush();
 
-                            String ackBack = inFromServer.readLine();
+                            // wait for ack and update clock vector
+                            String[] ackBackData = inFromServer.readLine().split(" ");
+
+                            // first two fields are always timestamp and incoming server ID
+                            int otherServerTime;
+                            int otherServerId;
+                            try {
+                                otherServerTime = Integer.parseInt(ackBackData[0]);
+                                otherServerId = Integer.parseInt(ackBackData[1]);
+                            } catch (Exception exp) {
+                                Logger.debug("Invalid message from server");
+                                return;
+                            }
+
+                            syncClockVector(otherServerId, otherServerTime);
+
                         } catch (IOException exp) {
                             Logger.debug(exp.getMessage());
                         }
@@ -89,7 +104,6 @@ public class ServerHandler {
      * this process is the smallest in the queue
      */
     private void waitForAllServers() {
-        boolean allInputProcessed = false;
         boolean csConditionSatisfied = false;
 
         while (!csConditionSatisfied) {
@@ -98,8 +112,8 @@ public class ServerHandler {
             // check if C.S. condition
             for (int i = 0; i < queue.length; i++) {
                 if (i != serverId && serverAvailability[i]
-                        && queue[i] < queue[serverId]
-                        && vectorClock[i] < queue[serverId]) {
+                        && (queue[i] < queue[serverId]
+                        || vectorClock[i] < queue[serverId])) {
                     csConditionSatisfied = false;
                 }
             }
@@ -153,7 +167,7 @@ public class ServerHandler {
                 // don't send back anything
                 return;
             } else if (serverData[0].equalsIgnoreCase(Constants.REQUEST_JOIN_COMMAND)) {
-                outputStr += handleJoinRequest();
+                outputStr += "\n" + handleJoinRequest();
             } else if (serverData[0].equalsIgnoreCase(Constants.SYNC_DATA_COMMAND)) {
                 String serializedData = inFromServer.readLine();
                 handleSyncRequest(serializedData);
