@@ -1,7 +1,11 @@
+import org.omg.CORBA.MARSHAL;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Server {
 
@@ -40,7 +44,27 @@ public class Server {
         return false;
     }
 
-    private void loadConfig(String fileName) {
+    private void loadConfig(String fileName)  {
+
+        try
+        {
+        FileReader inputFile = new FileReader(fileName);
+        BufferedReader reader = new BufferedReader(inputFile);
+        String line;
+
+            List<MachineAddress> machineAddressesInConfigFile = new ArrayList<MachineAddress>();
+            while ((line = reader.readLine()) != null) {
+
+                String[] lineContents = line.split(" ");
+    
+            }
+
+        }
+
+        catch (IOException e){
+            Logger.debug(e.getMessage());
+        }
+
 
     }
 
