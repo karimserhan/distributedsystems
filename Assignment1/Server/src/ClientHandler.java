@@ -14,7 +14,7 @@ public class ClientHandler {
         this.server = server;
     }
 
-    public void handleClient(Socket clientSocket) {
+    public void handleClientRequest(Socket clientSocket) {
         try {
             BufferedReader inFromClient = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
@@ -24,10 +24,7 @@ public class ClientHandler {
 
             if (clientData.length < 2) {
                 outputStr = "Invalid command from client";
-                return;
-            }
-
-            if (clientData[0].equalsIgnoreCase(Constants.RESERVE_COMMAND)) {
+            } else if (clientData[0].equalsIgnoreCase(Constants.RESERVE_COMMAND)) {
                 int count;
                 try {
                     count = Integer.parseInt(clientData[2]);
@@ -54,7 +51,7 @@ public class ClientHandler {
     }
 
     private String handleReserveRequest(String name, int count) {
-        this.server.getServerHandler().requestCriticalSection();
+        this.server.requestCriticalSection();
         // wait to acquire CS
         // output_msg = update reservations
         // release

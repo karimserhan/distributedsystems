@@ -19,14 +19,15 @@ public class Server {
     private void listenForIncomingRequests() {
         try {
             ServerSocket listener = new ServerSocket(serverAddresses[serverId].getPort());
+            listener.setSoTimeout(Constants.TIMEOUT_INTERVAL);
             while (true) {
                 Socket incomingSocket = listener.accept();
-                if (isServer(incomingSocket.getPort())) {
-
+                if (isServer(incomingSocket)) {
+                    serverHandler.handleServerRequest(incomingSocket);
                 } else{
-                    clientHandler.handleClient(incomingSocket);
-                    incomingSocket.close();
+                    clientHandler.handleClientRequest(incomingSocket);
                 }
+                incomingSocket.close();
             }
         }
         catch (IOException exp) {
@@ -34,9 +35,10 @@ public class Server {
         }
     }
 
-    private boolean isServer(int port) {
+    private boolean isServer(Socket serverSocket) {
         for (MachineAddress serverAddress :  serverAddresses) {
-            if (serverAddress.getPort() == port) {
+            if (serverAddress.getIpAddress().equals(serverSocket.getInetAddress())
+                    && serverAddress.getPort() == serverSocket.getPort()) {
                 return true;
             }
         }
@@ -83,6 +85,10 @@ public class Server {
 
     public String[] getReservations() {
         return reservations;
+    }
+
+    public void requestCriticalSection() {
+        serverHandler.requestCriticalSection();
     }
 
 
