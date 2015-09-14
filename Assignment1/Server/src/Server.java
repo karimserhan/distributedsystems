@@ -69,6 +69,10 @@ public class Server {
     }
 
     // Getters
+    public ServerHandler getServerHandler() {
+        return serverHandler;
+    }
+
     public int getServerId() {
         return serverId;
     }
