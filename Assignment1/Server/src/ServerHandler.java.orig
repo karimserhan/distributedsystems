@@ -17,7 +17,6 @@ public class ServerHandler {
         this.serverId = server.getServerId();
         this.serverAddresses = server.getServerAddresses();
         this.reservations = server.getReservations();
-
         int numOfServers = serverAddresses.length;
         this.vectorClock = new int[numOfServers]; // defaults to zeros
         this.queue = new int[numOfServers]; // defaults to zeros
@@ -60,6 +59,10 @@ public class ServerHandler {
                             outToServer.println(message);
                             outToServer.flush();
 
+<<<<<<< HEAD
+                            String ackBack = inFromServer.readLine();
+                            //Update vector clock from servers
+=======
                             // wait for ack and update clock vector
                             String[] ackBackData = inFromServer.readLine().split(" ");
 
@@ -76,6 +79,7 @@ public class ServerHandler {
 
                             syncClockVector(otherServerId, otherServerTime);
 
+>>>>>>> b0070a2881cb43b32f5e00bd81195f985031e664
                         } catch (IOException exp) {
                             Logger.debug(exp.getMessage());
                         }
