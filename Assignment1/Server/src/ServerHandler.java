@@ -17,7 +17,6 @@ public class ServerHandler {
         this.serverId = server.getServerId();
         this.serverAddresses = server.getServerAddresses();
         this.reservations = server.getReservations();
-
         int numOfServers = serverAddresses.length;
         this.vectorClock = new int[numOfServers]; // defaults to zeros
         this.queue = new int[numOfServers]; // defaults to zeros
@@ -61,6 +60,7 @@ public class ServerHandler {
                             outToServer.flush();
 
                             String ackBack = inFromServer.readLine();
+                            //Update vector clock from servers
                         } catch (IOException exp) {
                             Logger.debug(exp.getMessage());
                         }
@@ -89,7 +89,6 @@ public class ServerHandler {
      * this process is the smallest in the queue
      */
     private void waitForAllServers() {
-        boolean allInputProcessed = false;
         boolean csConditionSatisfied = false;
 
         while (!csConditionSatisfied) {
