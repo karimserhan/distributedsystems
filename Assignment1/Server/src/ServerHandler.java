@@ -1,8 +1,5 @@
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.util.ArrayList;
 
 /**
@@ -130,10 +127,13 @@ public class ServerHandler {
                             syncClockVector(otherServerId, otherServerTime);
                         } catch (SocketTimeoutException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
-                        }
-                        catch (IOException exp) {
+                        } catch (ConnectException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
+                        } catch (Exception exp) {
+                            Logger.debug("Unexpected exception");
+                            Logger.debug(exp.getMessage());
+                            exp.printStackTrace();
                         }
                     }
                 });
@@ -181,9 +181,13 @@ public class ServerHandler {
 
                     // close socket connection
                     serverSocket.close();
-                } catch (IOException e) {
+                } catch (ConnectException exp) {
                     killServer(serverAddresses[i].getIpAddress());
-                    e.printStackTrace();
+                    Logger.debug(exp.getMessage());
+                } catch (Exception exp) {
+                    Logger.debug("Unexpected exception");
+                    Logger.debug(exp.getMessage());
+                    exp.printStackTrace();
                 }
             } else if (i != serverId) {
                 Logger.debug("Skipping release message to server " + i + " because he's dead");
@@ -254,10 +258,13 @@ public class ServerHandler {
 
                         } catch (SocketTimeoutException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
-                        }
-                        catch (IOException exp) {
+                        } catch (ConnectException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
+                        } catch (Exception exp) {
+                            Logger.debug("Unexpected exception");
+                            Logger.debug(exp.getMessage());
+                            exp.printStackTrace();
                         }
                     }
                 });
@@ -338,10 +345,13 @@ public class ServerHandler {
                             updateReservations(tableData, otherServerTime);
                         } catch (SocketTimeoutException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
-                        }
-                        catch (IOException exp) {
+                        } catch (ConnectException exp) {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
+                        } catch (Exception exp) {
+                            Logger.debug("Unexpected exception");
+                            Logger.debug(exp.getMessage());
+                            exp.printStackTrace();
                         }
                     }
                 });
