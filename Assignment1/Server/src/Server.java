@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -79,12 +80,19 @@ public class Server {
         String line;
 
             List<MachineAddress> machineAddressesInConfigFile = new ArrayList<MachineAddress>();
+            int tempServerIndex = 0;
             while ((line = reader.readLine()) != null) {
 
                 String[] lineContents = line.split(" ");
-    
+                InetAddress serverIpAddress = InetAddress.getByName(lineContents[0]);
+                int portAddress = Integer.parseInt(lineContents[1]);
+                MachineAddress address = new MachineAddress(serverIpAddress, portAddress);
+                machineAddressesInConfigFile.add(tempServerIndex, address);
+                tempServerIndex++;
             }
 
+            serverAddresses = new MachineAddress[machineAddressesInConfigFile.size()];
+            machineAddressesInConfigFile.toArray(serverAddresses);
         }
 
         catch (IOException e){

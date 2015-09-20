@@ -10,58 +10,21 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        ServerSocket listener = new ServerSocket(6666);
-        listener.setSoTimeout(Constants.TIMEOUT_INTERVAL);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                Socket clientSocket = null;
-                try {
-                    clientSocket = listener.accept();
-                    clientSocket.setSoTimeout(5000);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                BufferedReader input = null;
-                try {
-                    input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    System.out.println("read: " + input.readLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-        System.out.println("send to server: ");
-        Scanner sc = new Scanner(System.in);
-
-        Socket serverSocket = new Socket(
-                InetAddress.getLocalHost(),
-                6666);
-        serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
-
-        PrintStream outToServer = new PrintStream(serverSocket.getOutputStream());
-        outToServer.println(sc.nextLine());
-
-        String filePath = args[0];
-        FileReader inputFile = new FileReader(filePath);
-        BufferedReader reader = new BufferedReader(inputFile);
-        String line;
-
-        try {
-            while ((line = reader.readLine()) != null) {
-
-                System.out.println(line);
-
-            }
+        if (args.length < 3) {
+            System.out.println("Provide these cmd args: <config_file> <server_index> <nbr_of_seats>");
+            return;
         }
 
-        catch (IOException e){}
-
+        String configFile;
+        int serverIndex, nbrOfSeats;
+        try {
+            configFile = args[0];
+            serverIndex = Integer.parseInt(args[1]);
+            nbrOfSeats = Integer.parseInt(args[2]);
+        }catch(NumberFormatException exp) {
+            System.out.println("Wrong cmd args format");
+            return;
+        }
+        Server server = new Server(serverIndex, nbrOfSeats, configFile);
     }
 }
