@@ -46,7 +46,7 @@ public class Main {
         }
     }
 
-    private static void handleSingleCommand(String command)
+    private static boolean handleSingleCommand(String command)
     {
         while(true)
         {
@@ -68,7 +68,7 @@ public class Main {
 
                 System.out.println(inFromServer.readLine());
                 serverSocket.close();
-                break;
+                return true;
                 
             }
 
@@ -79,12 +79,12 @@ public class Main {
                 if(aliveServers.size() ==0)
                 {
                     System.out.println("Servers not Available");
+                    return false;
                 }
             }
-
-            catch(Exception e)
-            {
-                System.out.println(e.getMessage());
+            catch (Exception e) {
+                e.printStackTrace();
+                return false;
             }
         }
     }

@@ -1,3 +1,5 @@
+import sun.rmi.runtime.Log;
+
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
@@ -45,6 +47,8 @@ public class ServerHandler {
      * to Lamport's algorithm. Blocks until we can enter the C.S.
      */
     public void acquireCriticalSection(boolean isWriteRequest) {
+        Logger.debug("Acquiring critical section...");
+
         // increment my clock
         vectorClock[serverId]++;
 
@@ -58,6 +62,7 @@ public class ServerHandler {
         // send request message to all servers
         for (int i = 0; i < serverAddresses.length; i++) {
             if (i != serverId && serverAvailability[i]) {
+                Logger.debug("Requesting C.S. from server " + i);
                 final int currentServerIndex = i;
 
                 Thread connectionThread = new Thread(new Runnable() {
@@ -83,7 +88,9 @@ public class ServerHandler {
                             outToServer.flush();
 
                             // wait for ack and update clock vector
-                            String[] ackBackData = inFromServer.readLine().split(" ");
+                            String ackBack = inFromServer.readLine();
+                            Logger.debug("Got following response from server " + currentServerIndex + ":\n" + ackBack);
+                            String[] ackBackData = ackBack.split(" ");
 
                             // close socket connection
                             serverSocket.close();
@@ -110,13 +117,20 @@ public class ServerHandler {
                 });
                 connectionThread.start();
             }
+            else {
+                Logger.debug("Skipping server " + i + " because he's dead");
+            }
         }
 
         // wait until we can enter the critical section
+        Logger.debug("Waiting for critical section to be granted...");
         waitForAllServers(isWriteRequest);
+        Logger.debug("Critical section has been granted");
     }
 
     public void releaseCriticalSection() {
+        Logger.debug("Releasing critical section...");
+
         // increment my clock
         vectorClock[serverId]++;
 
@@ -128,6 +142,7 @@ public class ServerHandler {
         // send release message to all servers
         for (int i = 0; i < serverAddresses.length; i++) {
             if (i != serverId && serverAvailability[i]) {
+                Logger.debug("Sending release message to server " + i);
                 Socket serverSocket = null;
                 try {
                     serverSocket = new Socket(
@@ -147,11 +162,17 @@ public class ServerHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+                Logger.debug("Skipping release message to server " + i + " because he's dead");
             }
         }
+
+        Logger.debug("Done sending all release messages");
     }
 
     public void syncDataWithSquad() {
+        Logger.debug("Sending the updated data to all other servers...");
+
         // increment my clock
         vectorClock[serverId]++;
 
@@ -162,6 +183,7 @@ public class ServerHandler {
         // send new data message to all servers
         for (int i = 0; i < serverAddresses.length; i++) {
             if (i != serverId && serverAvailability[i]) {
+                Logger.debug("Sending to server " + i);
                 final int currentServerIndex = i;
 
                 Thread connectionThread = new Thread(new Runnable() {
@@ -187,7 +209,9 @@ public class ServerHandler {
                             outToServer.flush();
 
                             // wait for ack and update clock vector
-                            String[] ackBackData = inFromServer.readLine().split(" ");
+                            String ackBack = inFromServer.readLine();
+                            Logger.debug("Got following response from server " + currentServerIndex + ":\n" + ackBack);
+                            String[] ackBackData = ackBack.split(" ");
 
                             // close socket connection
                             serverSocket.close();
@@ -215,9 +239,12 @@ public class ServerHandler {
                 });
                 connectionThread.start();
                 outstandingThreads.add(connectionThread);
+            } else {
+                Logger.debug("Skipping server " + i + " because he's dead");
             }
         }
 
+        Logger.debug("Waiting for ack back from all servers");
         // wait for all outstanding threads
         for (Thread thread : outstandingThreads) {
             try {
@@ -226,15 +253,19 @@ public class ServerHandler {
                 e.printStackTrace();
             }
         }
+        Logger.debug("All ack backs have been received... Data is now synced with everyone");
     }
 
     public void joinSquad() {
+        Logger.debug("Joining the server group");
+
         // increment my clock
         vectorClock[serverId]++;
 
         // send request to join message to all servers
         for (int i = 0; i < serverAddresses.length; i++) {
             if (i != serverId && serverAvailability[i]) {
+                Logger.debug("Sending join request to server " + i);
                 final int currentServerIndex = i;
 
                 Thread connectionThread = new Thread(new Runnable() {
@@ -259,7 +290,10 @@ public class ServerHandler {
                             outToServer.flush();
 
                             // wait for ack and update clock vector
-                            String[] ackBackData = inFromServer.readLine().split(" ");
+                            String ackBack = inFromServer.readLine();
+                            Logger.debug("Got following response from server " + currentServerIndex + ":\n" + ackBack);
+                            String[] ackBackData = ackBack.split(" ");
+
                             String tableData = inFromServer.readLine();
 
                             // close socket connection
@@ -287,6 +321,8 @@ public class ServerHandler {
                     }
                 });
                 connectionThread.start();
+            } else {
+                Logger.debug("Skipping server " + i + " because he's dead");
             }
         }
     }
@@ -346,6 +382,7 @@ public class ServerHandler {
         for (MachineAddress addr : serverAddresses) {
             if (addr.equals(address)) {
                 serverAvailability[serverId] = false;
+                Logger.debug("Killing server " + serverId + " because he took too long to respond");
             }
         }
         serverId++;
@@ -359,6 +396,7 @@ public class ServerHandler {
      */
     public void handleServerRequest(Socket serverSocket) {
         try {
+            Logger.debug("Incoming request received from server " + serverSocket.getInetAddress().getHostAddress());
             BufferedReader inFromServer = new BufferedReader(
                     new InputStreamReader(serverSocket.getInputStream()));
             String[] serverData = inFromServer.readLine().split(" ");
@@ -383,6 +421,7 @@ public class ServerHandler {
             String outputStr = vectorClock[serverId] + " " + serverId + " ";
 
             if (serverData[2].equalsIgnoreCase(Constants.REQUEST_CS_COMMAND)) {
+                Logger.debug("Server " + otherServerId + " is requesting critical section");
                 boolean isWriteRequest = serverData[3].equalsIgnoreCase("write");
 
                 // update queue for incoming process with its timestamp & request type
@@ -390,25 +429,27 @@ public class ServerHandler {
                 isWriteRequestQueue[otherServerId] = isWriteRequest;
 
                 // construct ack to send back
+                Logger.debug("Acking back for CS to server " + serverId);
                 outputStr += Constants.ACK_CS_COMMAND;
             } else if (serverData[2].equalsIgnoreCase(Constants.RELEASE_CS_COMMAND)) {
+                Logger.debug("Server " + otherServerId + " is releasing critical section");
                 // update queue for incoming processwith value infinity
                 queue[otherServerId] = Integer.MAX_VALUE;
 
                 // don't send back anything
                 return;
             } else if (serverData[2].equalsIgnoreCase(Constants.REQUEST_JOIN_COMMAND)) {
-                // ignore joins if I'm in a write C.S.
-                if (isInWriteCriticalSection) {
-                    return;
-                }
+                Logger.debug("Server " + otherServerId + " is requesting to join the group");
+                Logger.debug("Replying to server " + otherServerId + " with my data");
                 outputStr += "\n" + serializeReservations();
             } else if (serverData[0].equalsIgnoreCase(Constants.SYNC_DATA_COMMAND)) {
+                Logger.debug("Server " + otherServerId + " is sending his data to sync");
                 String serializedData = inFromServer.readLine();
                 updateReservations(serializedData, otherServerTime);
                 // we need to ack back to ensure release is not sent before
                 // everyone synced their data -- cuz otherwise we can serve a client
                 // with outdated data (since it's a multithreaded server)
+                Logger.debug("Acking back to sync command to server " + otherServerId);
                 outputStr += Constants.ACK_SYNC_COMMAND;
             } else {
                 Logger.debug("Invalid message from server");

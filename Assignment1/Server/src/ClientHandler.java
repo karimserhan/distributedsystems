@@ -21,6 +21,8 @@ public class ClientHandler {
     }
 
     public void handleClientRequest(Socket clientSocket) {
+        Logger.debug("Incoming request received from client " + clientSocket.getInetAddress().getHostAddress());
+
         try {
             BufferedReader inFromClient = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
@@ -29,8 +31,10 @@ public class ClientHandler {
             String outputStr;
 
             if (clientData.length < 2) {
+                Logger.debug("Received invalid message from the client");
                 outputStr = "Invalid command from client";
             } else if (clientData[0].equalsIgnoreCase(Constants.RESERVE_COMMAND)) {
+                Logger.debug("Received reserve request from client");
                 int count;
                 try {
                     count = Integer.parseInt(clientData[2]);
@@ -40,10 +44,13 @@ public class ClientHandler {
                 }
                 outputStr = handleReserveRequest(clientData[1], count);
             } else if (clientData[0].equalsIgnoreCase(Constants.SEARCH_COMMAND)) {
+                Logger.debug("Received search request from client");
                 outputStr = handleSearchRequest(clientData[1]);
             } else if (clientData[0].equalsIgnoreCase(Constants.DELETE_COMMAND)) {
+                Logger.debug("Received delete request from client");
                 outputStr = handleDeleteRequest(clientData[1]);
             } else {
+                Logger.debug("Received invalid message from the client");
                 outputStr = "Invalid command from client";
             }
 
@@ -62,6 +69,7 @@ public class ClientHandler {
             // wait to acquire CS
             this.server.getServerHandler().acquireCriticalSection(true);
 
+            Logger.debug("Reserving " + count + " seats for " + name);
             String returnMsg;
 
             // check if we have count available entries, and no current reservations for this name
@@ -70,7 +78,7 @@ public class ClientHandler {
             String delimiter = "";
             for (int i = 0; i < reservations.length; i++) {
                 if (reservations[i] == null) { available++; }
-                if (reservations[i].equals(name)) {
+                else if (reservations[i].equals(name)) {
                     currentReservations += delimiter + i;
                     delimiter = ", ";
                 }
@@ -115,6 +123,8 @@ public class ClientHandler {
             // wait to acquire CS
             this.server.getServerHandler().acquireCriticalSection(true);
 
+            Logger.debug("Deleting all seats for " + name);
+
             // empty the reservations
             int releasedSeats = 0, availableSeats = 0;
             for (int i = 0; i < reservations.length; i++) {
@@ -144,10 +154,8 @@ public class ClientHandler {
     private String handleSearchRequest(String name) {
         rwlock.writeLock().lock();
         try {
-            // wait to acquire CS
-            // this.server.getServerHandler().acquireCriticalSection(false);
+            Logger.debug("Searching for seats for " + name);
 
-            // search the reservations
             String foundSeats = "";
             String delimiter = "";
             for (int i = 0; i < reservations.length; i++) {
@@ -167,10 +175,6 @@ public class ClientHandler {
             // tell my squad about new table
             this.server.getServerHandler().syncDataWithSquad();
 
-            // send output_msg to client
-
-            // release
-            // this.server.getServerHandler().releaseCriticalSection();
             return returnMsg;
         } finally {
             rwlock.writeLock().unlock();

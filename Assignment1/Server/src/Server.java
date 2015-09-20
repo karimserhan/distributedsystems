@@ -15,6 +15,9 @@ public class Server {
     private String[] reservations;
 
     public Server(int serverId, int nbrOfSeats, String configFileName) {
+        // set up logger
+        Logger.serverIndex = serverId;
+
         loadConfig(configFileName);
         this.serverId = serverId;
         this.reservations = new String[nbrOfSeats];
