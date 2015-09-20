@@ -70,7 +70,7 @@ public class ClientHandler {
             String delimiter = "";
             for (int i = 0; i < reservations.length; i++) {
                 if (reservations[i] == null) { available++; }
-                if (reservations[i].equals(name)) {
+                else if (reservations[i].equals(name)) {
                     currentReservations += delimiter + i;
                     delimiter = ", ";
                 }

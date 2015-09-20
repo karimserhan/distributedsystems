@@ -24,6 +24,7 @@ public class Main {
         }
 
         loadConfig(args[0]);
+        System.out.println(args[0]);
 
         while(true)
         {
@@ -48,16 +49,19 @@ public class Main {
 
     private static void handleSingleCommand(String command)
     {
+
         while(true)
         {
             Random rand = new Random();
             int randNumber = rand.nextInt(aliveServers.size());
             InetAddress serverIpAddress = (aliveServers.get(randNumber)).getIpAddress();
+
             int serverPort = (aliveServers.get(randNumber)).getPort();
+            System.out.println(serverIpAddress.getHostAddress() + " "  + serverPort);
 
             try (Socket serverSocket = new Socket(serverIpAddress, serverPort)) {
 
-                serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
+                serverSocket.setSoTimeout(7000);
 
                 BufferedReader inFromServer = new BufferedReader(
                         new InputStreamReader(serverSocket.getInputStream()));
@@ -68,8 +72,7 @@ public class Main {
 
                 System.out.println(inFromServer.readLine());
                 serverSocket.close();
-                break;
-                
+                return;
             }
 
             catch(SocketTimeoutException e)
@@ -79,12 +82,16 @@ public class Main {
                 if(aliveServers.size() ==0)
                 {
                     System.out.println("Servers not Available");
+                    return;
+
                 }
             }
 
             catch(Exception e)
             {
                 System.out.println(e.getMessage());
+                return;
+
             }
         }
     }
@@ -111,6 +118,7 @@ public class Main {
 
             serverAddresses = new MachineAddress[machineAddressesInConfigFile.size()];
             machineAddressesInConfigFile.toArray(serverAddresses);
+
         }
 
         catch (IOException e){

@@ -95,7 +95,7 @@ public class ServerHandler {
                                 otherServerTime = Integer.parseInt(ackBackData[0]);
                                 otherServerId = Integer.parseInt(ackBackData[1]);
                             } catch (Exception exp) {
-                                Logger.debug("Invalid message from server");
+                                Logger.debug("Invalid message from serveraaa");
                                 return;
                             }
 
@@ -199,7 +199,7 @@ public class ServerHandler {
                                 otherServerTime = Integer.parseInt(ackBackData[0]);
                                 otherServerId = Integer.parseInt(ackBackData[1]);
                             } catch (Exception exp) {
-                                Logger.debug("Invalid message from server");
+                                Logger.debug("Invalid message from serverp");
                                 return;
                             }
 
@@ -272,7 +272,8 @@ public class ServerHandler {
                                 otherServerTime = Integer.parseInt(ackBackData[0]);
                                 otherServerId = Integer.parseInt(ackBackData[1]);
                             } catch (Exception exp) {
-                                Logger.debug("Invalid message from server");
+                                exp.printStackTrace();
+                                Logger.debug(ackBackData[0]);
                                 return;
                             }
 
@@ -443,6 +444,8 @@ public class ServerHandler {
             serializedData += delimeter + ((reservation == null) ? "" : reservation);
             delimeter = "|||";
         }
+
+        System.out.println(serializedData);
         return serializedData;
     }
 
