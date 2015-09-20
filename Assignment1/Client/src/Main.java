@@ -53,9 +53,9 @@ public class Main {
             Random rand = new Random();
             int randNumber = rand.nextInt(aliveServers.size());
             InetAddress serverIpAddress = (aliveServers.get(randNumber)).getIpAddress();
-            int serverPort = (aliveServers.get(randNumber)).getPort();
+            int clientPort = (aliveServers.get(randNumber)).getClientPort();
 
-            try (Socket serverSocket = new Socket(serverIpAddress, serverPort)) {
+            try (Socket serverSocket = new Socket(serverIpAddress, clientPort)) {
 
                 serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
 
@@ -103,8 +103,9 @@ public class Main {
 
                 String[] lineContents = line.split(" ");
                 InetAddress serverIpAddress = InetAddress.getByName(lineContents[0]);
-                int portAddress = Integer.parseInt(lineContents[1]);
-                MachineAddress address = new MachineAddress(serverIpAddress, portAddress);
+                int clientPort = Integer.parseInt(lineContents[1]);
+                int serverPort = Integer.parseInt(lineContents[2]);
+                MachineAddress address = new MachineAddress(serverIpAddress, clientPort,serverPort);
                 machineAddressesInConfigFile.add(tempServerIndex, address);
                 tempServerIndex++;
             }
