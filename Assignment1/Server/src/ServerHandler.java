@@ -126,9 +126,9 @@ public class ServerHandler {
 
                             syncClockVector(otherServerId, otherServerTime);
                         } catch (SocketTimeoutException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                         } catch (ConnectException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                             Logger.debug(exp.getMessage());
                         } catch (Exception exp) {
                             Logger.debug("Unexpected exception");
@@ -182,7 +182,7 @@ public class ServerHandler {
                     // close socket connection
                     serverSocket.close();
                 } catch (ConnectException exp) {
-                    killServer(serverAddresses[i].getIpAddress());
+                    killServer(i);
                     Logger.debug(exp.getMessage());
                 } catch (Exception exp) {
                     Logger.debug("Unexpected exception");
@@ -257,9 +257,9 @@ public class ServerHandler {
                             syncClockVector(otherServerId, otherServerTime);
 
                         } catch (SocketTimeoutException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                         } catch (ConnectException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                             Logger.debug(exp.getMessage());
                         } catch (Exception exp) {
                             Logger.debug("Unexpected exception");
@@ -344,9 +344,9 @@ public class ServerHandler {
                             syncClockVector(otherServerId, otherServerTime);
                             updateReservations(tableData, otherServerTime);
                         } catch (SocketTimeoutException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                         } catch (ConnectException exp) {
-                            killServer(serverAddresses[currentServerIndex].getIpAddress());
+                            killServer(currentServerIndex);
                             Logger.debug(exp.getMessage());
                         } catch (Exception exp) {
                             Logger.debug("Unexpected exception");
@@ -412,15 +412,9 @@ public class ServerHandler {
         }
     }
 
-    private void killServer(InetAddress address) {
-        int serverId = 0;
-        for (MachineAddress addr : serverAddresses) {
-            if (addr.equals(address)) {
-                serverAvailability[serverId] = false;
-                Logger.debug("Killing server " + serverId + " because he took too long to respond");
-            }
-        }
-        serverId++;
+    private void killServer(int otherServerIndex) {
+        serverAvailability[otherServerIndex] = false;
+        Logger.debug("Killing server " + serverId + " because he took too long to respond");
     }
 
     ////////////////////////////////////////////////////////
@@ -497,11 +491,7 @@ public class ServerHandler {
             outToServer.println(outputStr);
             outToServer.flush();
         }
-        catch (SocketTimeoutException exp) {
-            killServer(serverSocket.getInetAddress());
-        }
-        catch (IOException exp) {
-            killServer(serverSocket.getInetAddress());
+        catch (Exception exp) {
             Logger.debug(exp.getMessage());
         }
     }
