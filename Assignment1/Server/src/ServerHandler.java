@@ -463,7 +463,7 @@ public class ServerHandler {
                 Logger.debug("Server " + otherServerId + " is requesting to join the group");
                 Logger.debug("Replying to server " + otherServerId + " with my data");
                 outputStr += "\n" + serializeReservations();
-            } else if (serverData[0].equalsIgnoreCase(Constants.SYNC_DATA_COMMAND)) {
+            } else if (serverData[2].equalsIgnoreCase(Constants.SYNC_DATA_COMMAND)) {
                 Logger.debug("Server " + otherServerId + " is sending his data to sync");
                 String serializedData = inFromServer.readLine();
                 updateReservations(serializedData, otherServerTime);

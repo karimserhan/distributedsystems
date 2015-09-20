@@ -197,7 +197,6 @@ public class ClientHandler {
             }
 
             // tell my squad about new table
-            this.server.getServerHandler().syncDataWithSquad();
 
             return returnMsg;
         } finally {
