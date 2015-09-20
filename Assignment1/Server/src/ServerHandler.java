@@ -138,7 +138,7 @@ public class ServerHandler {
                 });
                 connectionThread.start();
             }
-            else {
+            else if (i != serverId) {
                 Logger.debug("Skipping server " + i + " because he's dead");
             }
         }
@@ -183,7 +183,7 @@ public class ServerHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else {
+            } else if (i != serverId) {
                 Logger.debug("Skipping release message to server " + i + " because he's dead");
             }
         }
@@ -260,7 +260,7 @@ public class ServerHandler {
                 });
                 connectionThread.start();
                 outstandingThreads.add(connectionThread);
-            } else {
+            } else if (i != serverId) {
                 Logger.debug("Skipping server " + i + " because he's dead");
             }
         }
@@ -342,7 +342,7 @@ public class ServerHandler {
                     }
                 });
                 connectionThread.start();
-            } else {
+            } else if (i != serverId) {
                 Logger.debug("Skipping server " + i + " because he's dead");
             }
         }
@@ -503,7 +503,7 @@ public class ServerHandler {
         String delimeter = "";
         for (String reservation : reservations) {
             serializedData += delimeter + ((reservation == null) ? "" : reservation);
-            delimeter = "|||";
+            delimeter = "\t";
         }
         return serializedData;
     }
@@ -513,7 +513,7 @@ public class ServerHandler {
             return;
         }
 
-        String[] allReserervedNames = serializedData.split("|||");
+        String[] allReserervedNames = serializedData.split("\t",-1);
         if (allReserervedNames.length != reservations.length) {
             Logger.debug("Looks like a server has a non-consistent reservations table than me! GTFO");
             return;
