@@ -132,6 +132,7 @@ public class ServerHandler {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                         }
                         catch (IOException exp) {
+                            killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
                         }
                     }
@@ -181,6 +182,7 @@ public class ServerHandler {
                     // close socket connection
                     serverSocket.close();
                 } catch (IOException e) {
+                    killServer(serverAddresses[i].getIpAddress());
                     e.printStackTrace();
                 }
             } else if (i != serverId) {
@@ -254,6 +256,7 @@ public class ServerHandler {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                         }
                         catch (IOException exp) {
+                            killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
                         }
                     }
@@ -337,6 +340,7 @@ public class ServerHandler {
                             killServer(serverAddresses[currentServerIndex].getIpAddress());
                         }
                         catch (IOException exp) {
+                            killServer(serverAddresses[currentServerIndex].getIpAddress());
                             Logger.debug(exp.getMessage());
                         }
                     }
@@ -420,7 +424,9 @@ public class ServerHandler {
             Logger.debug("Incoming request received from server " + serverSocket.getInetAddress().getHostAddress());
             BufferedReader inFromServer = new BufferedReader(
                     new InputStreamReader(serverSocket.getInputStream()));
-            String[] serverData = inFromServer.readLine().split(" ");
+            String line = inFromServer.readLine();
+            Logger.debug("Received following request form server:\n" + line);
+            String[] serverData = line.split(" ");
 
             // first two fields are always timestamp and incoming server ID
             int otherServerTime;
@@ -485,6 +491,7 @@ public class ServerHandler {
             killServer(serverSocket.getInetAddress());
         }
         catch (IOException exp) {
+            killServer(serverSocket.getInetAddress());
             Logger.debug(exp.getMessage());
         }
     }
