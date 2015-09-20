@@ -5,9 +5,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Scanner;
 
-/**
- * Created by Karim-pc1 on 9/13/2015.
- */
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length < 3) {

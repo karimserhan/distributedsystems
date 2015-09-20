@@ -2,18 +2,26 @@ import java.net.InetAddress;
 
 public class MachineAddress {
     private InetAddress ipAddress;
-    private int port;
+    private int clientPort;
+    private int serverPort;
 
-    public MachineAddress(InetAddress ipAddress, int port) {
+    public MachineAddress(InetAddress ipAddress, int clientPort, int serverPort) {
         this.ipAddress = ipAddress;
-        this.port = port;
+        this.clientPort = clientPort;
+        this.serverPort = serverPort;
     }
 
     public InetAddress getIpAddress() {
         return ipAddress;
     }
 
-    public int getPort() {
-        return port;
+    public int getClientPort()
+    {
+        return clientPort;
+    }
+
+    public int getServerPort()
+    {
+        return serverPort;
     }
 }

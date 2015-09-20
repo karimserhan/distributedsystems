@@ -28,59 +28,29 @@ public class Server {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                listenForIncomingRequests();
+                clientHandler.listenForIncomingRequests(
+                        serverAddresses[serverId].getClientPort());
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                serverHandler.listenForIncomingRequests(
+                        serverAddresses[serverId].getServerPort());
             }
         }).start();
 
         this.serverHandler.joinSquad();
     }
 
-    private void listenForIncomingRequests() {
-        try {
-            ServerSocket listener = new ServerSocket(serverAddresses[serverId].getPort());
-            while (true) {
-                Socket incomingSocket = listener.accept();
-                incomingSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
-
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isServer(incomingSocket)) {
-                            serverHandler.handleServerRequest(incomingSocket);
-                        } else{
-                            clientHandler.handleClientRequest(incomingSocket);
-                        }
-
-                        try { incomingSocket.close(); }
-                        catch (IOException exp) { Logger.debug(exp.getMessage()); }
-                    }
-                });
-                thread.start();
-            }
-        }
-        catch (IOException exp) {
-            Logger.debug(exp.getMessage());
-        }
-    }
-
-    private boolean isServer(Socket serverSocket) {
-        for (MachineAddress serverAddress :  serverAddresses) {
-            if (serverAddress.getIpAddress().equals(serverSocket.getInetAddress())
-                    && serverAddress.getPort() == serverSocket.getPort()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void loadConfig(String fileName)  {
 
         try
         {
-        FileReader inputFile = new FileReader(fileName);
-        BufferedReader reader = new BufferedReader(inputFile);
-        String line;
+            FileReader inputFile = new FileReader(fileName);
+            BufferedReader reader = new BufferedReader(inputFile);
+            String line;
 
             List<MachineAddress> machineAddressesInConfigFile = new ArrayList<MachineAddress>();
             int tempServerIndex = 0;
@@ -88,8 +58,9 @@ public class Server {
 
                 String[] lineContents = line.split(" ");
                 InetAddress serverIpAddress = InetAddress.getByName(lineContents[0]);
-                int portAddress = Integer.parseInt(lineContents[1]);
-                MachineAddress address = new MachineAddress(serverIpAddress, portAddress);
+                int clientPort = Integer.parseInt(lineContents[1]);
+                int serverPort = Integer.parseInt(lineContents[2]);
+                MachineAddress address = new MachineAddress(serverIpAddress, clientPort,serverPort);
                 machineAddressesInConfigFile.add(tempServerIndex, address);
                 tempServerIndex++;
             }
@@ -99,7 +70,8 @@ public class Server {
         }
 
         catch (IOException e){
-            Logger.debug(e.getMessage());
+
+            System.out.println(e.getMessage());
         }
 
 

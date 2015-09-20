@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -18,6 +19,29 @@ public class ClientHandler {
     public ClientHandler(Server server) {
         this.server = server;
         this.reservations = server.getReservations();
+    }
+
+    public void listenForIncomingRequests(int port) {
+        try {
+            ServerSocket listener = new ServerSocket(port);
+            while (true) {
+                Socket incomingSocket = listener.accept();
+                incomingSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleClientRequest(incomingSocket);
+                        try { incomingSocket.close(); }
+                        catch (IOException exp) { Logger.debug(exp.getMessage()); }
+                    }
+                });
+                thread.start();
+            }
+        }
+        catch (IOException exp) {
+            Logger.debug(exp.getMessage());
+        }
     }
 
     public void handleClientRequest(Socket clientSocket) {

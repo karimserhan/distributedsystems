@@ -1,8 +1,6 @@
-import sun.rmi.runtime.Log;
-
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -39,6 +37,29 @@ public class ServerHandler {
         }
     }
 
+    public void listenForIncomingRequests(int port) {
+        try {
+            ServerSocket listener = new ServerSocket(port);
+            while (true) {
+                Socket incomingSocket = listener.accept();
+                incomingSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleServerRequest(incomingSocket);
+                        try { incomingSocket.close(); }
+                        catch (IOException exp) { Logger.debug(exp.getMessage()); }
+                    }
+                });
+                thread.start();
+            }
+        }
+        catch (IOException exp) {
+            Logger.debug(exp.getMessage());
+        }
+    }
+
     ////////////////////////////////////////////////////////
     ////////////// Sending ooutgoing requests //////////////
     ////////////////////////////////////////////////////////
@@ -71,7 +92,7 @@ public class ServerHandler {
                         try {
                             Socket serverSocket = new Socket(
                                     serverAddresses[currentServerIndex].getIpAddress(),
-                                    serverAddresses[currentServerIndex].getPort());
+                                    serverAddresses[currentServerIndex].getServerPort());
                             serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
 
                             BufferedReader inFromServer = new BufferedReader(
@@ -147,7 +168,7 @@ public class ServerHandler {
                 try {
                     serverSocket = new Socket(
                             serverAddresses[i].getIpAddress(),
-                            serverAddresses[i].getPort());
+                            serverAddresses[i].getServerPort());
 
                     PrintStream outToServer = new PrintStream(serverSocket.getOutputStream());
 
@@ -192,7 +213,7 @@ public class ServerHandler {
                         try {
                             Socket serverSocket = new Socket(
                                     serverAddresses[currentServerIndex].getIpAddress(),
-                                    serverAddresses[currentServerIndex].getPort());
+                                    serverAddresses[currentServerIndex].getServerPort());
                             serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
 
                             BufferedReader inFromServer = new BufferedReader(
@@ -274,7 +295,7 @@ public class ServerHandler {
                         try {
                             Socket serverSocket = new Socket(
                                     serverAddresses[currentServerIndex].getIpAddress(),
-                                    serverAddresses[currentServerIndex].getPort());
+                                    serverAddresses[currentServerIndex].getServerPort());
                             serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
 
                             BufferedReader inFromServer = new BufferedReader(
