@@ -1,7 +1,4 @@
-import org.omg.CORBA.MARSHAL;
-
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -16,18 +13,45 @@ public class Server {
     private MachineAddress[] serverAddresses;
     private String[] reservations;
 
+    public Server(int serverId, int nbrOfSeats, String configFileName) {
+        loadConfig(configFileName);
+        this.serverId = serverId;
+        this.reservations = new String[nbrOfSeats];
+
+        this.clientHandler = new ClientHandler(this);
+        this.serverHandler = new ServerHandler(this);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                listenForIncomingRequests();
+            }
+        }).start();
+
+        this.serverHandler.joinSquad();
+    }
+
     private void listenForIncomingRequests() {
         try {
             ServerSocket listener = new ServerSocket(serverAddresses[serverId].getPort());
-            listener.setSoTimeout(Constants.TIMEOUT_INTERVAL);
             while (true) {
                 Socket incomingSocket = listener.accept();
-                if (isServer(incomingSocket)) {
-                    serverHandler.handleServerRequest(incomingSocket);
-                } else{
-                    clientHandler.handleClientRequest(incomingSocket);
-                }
-                incomingSocket.close();
+                incomingSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isServer(incomingSocket)) {
+                            serverHandler.handleServerRequest(incomingSocket);
+                        } else{
+                            clientHandler.handleClientRequest(incomingSocket);
+                        }
+
+                        try { incomingSocket.close(); }
+                        catch (IOException exp) { Logger.debug(exp.getMessage()); }
+                    }
+                });
+                thread.start();
             }
         }
         catch (IOException exp) {
@@ -86,10 +110,4 @@ public class Server {
     public String[] getReservations() {
         return reservations;
     }
-
-    public void requestCriticalSection() {
-        serverHandler.requestCriticalSection();
-    }
-
-
 }
