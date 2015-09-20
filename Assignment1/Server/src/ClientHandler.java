@@ -78,6 +78,7 @@ public class ClientHandler {
                 outputStr = "Invalid command from client";
             }
 
+            Logger.debug("Replying to client with following response: \n" + outputStr);
             PrintWriter outToClient = new PrintWriter(clientSocket.getOutputStream());
             outToClient.println(outputStr);
             outToClient.flush();
@@ -195,9 +196,6 @@ public class ClientHandler {
             } else {
                 returnMsg = String.format("Failed: no reservation is made by %s.", name);
             }
-
-            // tell my squad about new table
-            this.server.getServerHandler().syncDataWithSquad();
 
             return returnMsg;
         } finally {
