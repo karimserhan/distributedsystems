@@ -1,9 +1,6 @@
 import javax.swing.plaf.synth.SynthEditorPaneUI;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -55,7 +52,8 @@ public class Main {
             InetAddress serverIpAddress = (aliveServers.get(randNumber)).getIpAddress();
             int clientPort = (aliveServers.get(randNumber)).getClientPort();
 
-            try (Socket serverSocket = new Socket(serverIpAddress, clientPort)) {
+            try {
+                Socket serverSocket = new Socket(serverIpAddress, clientPort);
 
                 serverSocket.setSoTimeout(Constants.TIMEOUT_INTERVAL);
 
@@ -72,7 +70,8 @@ public class Main {
                 
             }
 
-            catch(SocketTimeoutException e)
+
+            catch(Exception e)
             {
                 aliveServers.remove(randNumber);
 
@@ -81,10 +80,6 @@ public class Main {
                     System.out.println("Servers not Available");
                     return false;
                 }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                return false;
             }
         }
     }
