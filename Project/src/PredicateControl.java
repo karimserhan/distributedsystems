@@ -29,8 +29,6 @@ public class PredicateControl {
         }
 
         return resultShortestPath;
-
-
     }
 }
 

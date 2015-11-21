@@ -4,10 +4,9 @@ import java.util.ArrayList;
 
 public class FloydWarshall {
 
-    public static void getPairwiseShortestPath(boolean[][] adjacencyMatrix, int [][] minimumPairwiseDistances, int [][] nextHopEvent)
+    public static void getPairwiseShortestPath(boolean[][] adjacencyMatrix, int [][] minimumPairwiseDistances, int [][] nextHopEvents)
     {
-
-        int numberOfEvents = adjacencyMatrix.length; //Number of evenst in the computation
+        int numberOfEvents = adjacencyMatrix.length; //Number of events in the computation
         //Initialize return 2-D array to Integer.MAX_VALUE
         //Initialize next hop event to -1
 
@@ -16,7 +15,7 @@ public class FloydWarshall {
             for (int j = 0; j < numberOfEvents; j++)
             {
                 minimumPairwiseDistances[i][j] = Integer.MAX_VALUE;
-                nextHopEvent[i][j] = -1;
+                nextHopEvents[i][j] = -1;
             }
         }
 
@@ -24,6 +23,7 @@ public class FloydWarshall {
         for(int i=0; i<numberOfEvents; i++)
         {
             minimumPairwiseDistances[i][i] = 0;
+            nextHopEvents[i][i] = i;
         }
 
         //For each edge (u,v) set distance to 1
@@ -34,7 +34,7 @@ public class FloydWarshall {
                 if(adjacencyMatrix[i][j])
                 {
                     minimumPairwiseDistances[i][j] =1;
-                    nextHopEvent[i][j] = j;
+                    nextHopEvents[i][j] = j;
                 }
             }
         }
@@ -48,7 +48,7 @@ public class FloydWarshall {
                 {
                     if(minimumPairwiseDistances[i][j] > minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j]) {
                         minimumPairwiseDistances[i][j] = minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j];
-                        nextHopEvent[i][j] = nextHopEvent[i][k];
+                        nextHopEvents[i][j] = nextHopEvents[i][k];
                     }
                 }
             }
@@ -60,7 +60,7 @@ public class FloydWarshall {
     public  static ArrayList<Integer> getPath(int[][] nextHopEvents, int from, int to)
     {
         ArrayList<Integer> resultPath = new ArrayList<>();
-        if(nextHopEvents[to][from] == -1)
+        if(nextHopEvents[from][to] == -1)
         {
             return resultPath;
         }
@@ -69,7 +69,7 @@ public class FloydWarshall {
         while(from != to)
         {
             from = nextHopEvents[from][to];
-            resultPath.add(to);
+            resultPath.add(from);
         }
 
         return resultPath;
