@@ -160,7 +160,7 @@ public class ClientHandler {
                     availableSeats++;
                 }
             }
-            String returnMsg = String.format("%d seats have been released. %d seats are not available.",
+            String returnMsg = String.format("%d seats have been released. %d seats are now available.",
                     releasedSeats, availableSeats);
 
             // tell my squad about new table

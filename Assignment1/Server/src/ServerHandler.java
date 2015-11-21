@@ -414,7 +414,7 @@ public class ServerHandler {
 
     private void killServer(int otherServerIndex) {
         serverAvailability[otherServerIndex] = false;
-        Logger.debug("Killing server " + serverId + " because he took too long to respond");
+        Logger.debug("Killing server " + otherServerIndex + " because he didn't respond");
     }
 
     ////////////////////////////////////////////////////////
