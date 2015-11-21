@@ -7,7 +7,7 @@ import java.util.List;
 
 public class InputReader {
     private static List<List<Integer>> trace;
-    private static HashMap<Integer, Integer> messages;
+    private static HashMap<Integer, List<Integer>> messages;
     private static List<Integer> trueEvents;
 
     public static boolean[][] readTrace(String fileName) throws
@@ -45,7 +45,13 @@ public class InputReader {
             String[] evts = line.split(",");
             int sendEvt = Integer.parseInt(evts[0].trim());
             int rcvEvt = Integer.parseInt(evts[1].trim());
-            messages.put(rcvEvt, sendEvt);
+            if (messages.containsKey(rcvEvt)) {
+                messages.get(rcvEvt).add(sendEvt);
+            } else {
+                List<Integer> evtList = new LinkedList<>();
+                evtList.add(sendEvt);
+                messages.put(rcvEvt, evtList)
+            }
             line = reader.readLine();
         }
 
