@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InputReader {
+public class TraceReader {
     private List<List<Integer>> trace;
     private HashMap<Integer, List<Integer>> messages;
     private List<Integer> trueEvents;
     private List<Integer> trueInitials;
     private List<Integer> trueFinals;
 
-    public InputReader() {
+    public TraceReader() {
         trace = new LinkedList<>();
         messages = new HashMap<>();
         trueEvents = new LinkedList<>();

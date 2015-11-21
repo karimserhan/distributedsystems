@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TraceFileGenerator {
+public class TraceGenerator {
 
     private List<List<Integer>> trace;
     private List<Message> messages;
@@ -17,12 +17,12 @@ public class TraceFileGenerator {
     int minNbrMsgs;
     int maxNbrMsgs;
 
-    public TraceFileGenerator(int minNbrProcessors,
-                              int maxNbrProcessors,
-                              int minEventsPerProcess,
-                              int maxEventsPerProcess,
-                              int minNbrMsgs,
-                              int maxNbrMsgs) {
+    public TraceGenerator(int minNbrProcessors,
+                          int maxNbrProcessors,
+                          int minEventsPerProcess,
+                          int maxEventsPerProcess,
+                          int minNbrMsgs,
+                          int maxNbrMsgs) {
         this.trace = new LinkedList<>();
         this.messages = new LinkedList<>();
         this.minNbrProcessors = minNbrProcessors;

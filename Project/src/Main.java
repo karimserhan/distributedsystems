@@ -1,5 +1,3 @@
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ public class Main {
 
        // generatre trace file
        try {
-           TraceFileGenerator generator = new TraceFileGenerator(2, 2, 4, 5, 2, 2);
+           TraceGenerator generator = new TraceGenerator(2, 2, 4, 5, 2, 2);
            generator.generatreTraceFile(fileName);
        } catch (FileNotFoundException e) {
            System.out.println("Error writing to file");
@@ -22,11 +20,11 @@ public class Main {
 
        // process trace file
        try {
-           InputReader inputReader = new InputReader();
-           inputReader.readTrace(fileName);
-           boolean[][] trueEvtGraph = inputReader.getGraph();
-           List<Integer> trueInitials = inputReader.getInitialTrueStates();
-           List<Integer> trueFinals = inputReader.getFinalTrueStates();
+           TraceReader traceReader = new TraceReader();
+           traceReader.readTrace(fileName);
+           boolean[][] trueEvtGraph = traceReader.getGraph();
+           List<Integer> trueInitials = traceReader.getInitialTrueStates();
+           List<Integer> trueFinals = traceReader.getFinalTrueStates();
 
            ArrayList<Integer> shortestSequence = PredicateControl
                    .getShortestSequence(trueInitials, trueFinals, trueEvtGraph);
