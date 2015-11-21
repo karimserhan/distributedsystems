@@ -50,7 +50,7 @@ public class InputReader {
             } else {
                 List<Integer> evtList = new LinkedList<>();
                 evtList.add(sendEvt);
-                messages.put(rcvEvt, evtList)
+                messages.put(rcvEvt, evtList);
             }
             line = reader.readLine();
         }
@@ -139,9 +139,17 @@ public class InputReader {
             return true;
         }
         int localPrev = getPrev(f);
-        int remotePrev = -1;
-        if (messages.containsKey(f)) { remotePrev = messages.get(f); }
+        List<Integer> remotePrevs = new LinkedList<>();
+        if (messages.containsKey(f)) { remotePrevs = messages.get(f); }
 
-        return happensBefore(e, localPrev) || happensBefore(e, remotePrev);
+        if (happensBefore(e, localPrev)) { return true; }
+        
+        for (int remotePrev : remotePrevs){
+            if (happensBefore(e, remotePrev)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
