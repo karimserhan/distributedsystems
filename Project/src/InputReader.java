@@ -6,15 +6,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InputReader {
-    private static List<List<Integer>> trace;
-    private static HashMap<Integer, List<Integer>> messages;
-    private static List<Integer> trueEvents;
+    private List<List<Integer>> trace;
+    private HashMap<Integer, List<Integer>> messages;
+    private List<Integer> trueEvents;
+    private List<Integer> trueInitials;
+    private List<Integer> trueFinals;
 
-    public static boolean[][] readTrace(String fileName) throws
-            IOException, NumberFormatException{
+    public InputReader() {
         trace = new LinkedList<>();
         messages = new HashMap<>();
         trueEvents = new LinkedList<>();
+        trueInitials = new LinkedList<>();
+        trueFinals = new LinkedList<>();
+    }
+
+    public void readTrace(String fileName) throws
+            IOException, NumberFormatException {
 
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         String line = reader.readLine();
@@ -26,13 +33,17 @@ public class InputReader {
             List<Integer> localTrace = new LinkedList<>();
             String process = line.substring(0, line.indexOf(":"));
             int processID = Integer.parseInt(process.substring(1));
-            String events = line.substring(line.indexOf(":")+1);
-            for (String event : events.split(",")) {
+            String events = line.substring(line.indexOf(":") + 1);
+            String[] eventArr = events.split(",");
+            for (int i = 0; i < eventArr.length; i++) {
+                String event = eventArr[i];
                 String eventIdAsStr = event.substring(0, event.indexOf("(")).trim();
                 String predicateAsStr = event.substring(event.indexOf("(") + 1, event.indexOf(")")).trim();
                 int eventID = Integer.parseInt(eventIdAsStr);
                 if (predicateAsStr.equals("T")) {
                     trueEvents.add(eventID);
+                    if (i == 0) { trueInitials.add(eventID); }
+                    if (i == eventArr.length-1) { trueFinals.add(eventID); }
                 }
                 localTrace.add(eventID);
             }
@@ -54,11 +65,9 @@ public class InputReader {
             }
             line = reader.readLine();
         }
-
-        return constructGraph();
     }
 
-    private static boolean[][] constructGraph() {
+    public boolean[][] getGraph() {
         // Construct the true event graph
         int n = getNbrOfEvents();
         boolean[][] graph = new boolean[n][n];
@@ -75,7 +84,15 @@ public class InputReader {
         return graph;
     }
 
-    private static void isolateNode(boolean[][] graph, int e) {
+    public List<Integer> getInitialTrueStates() {
+        return trueInitials;
+    }
+    
+    public List<Integer> getFinalTrueStates() {
+        return trueFinals;
+    }
+
+    private void isolateNode(boolean[][] graph, int e) {
         int n = graph.length;
         for (int i = 0; i < n; i++) {
             graph[i][e] = false;
@@ -83,7 +100,7 @@ public class InputReader {
         }
     }
 
-    private static int getNbrOfEvents() {
+    private int getNbrOfEvents() {
         int sum = 0;
         for (int i = 0; i < trace.size(); i++) {
             sum += trace.get(i).size();
@@ -91,7 +108,7 @@ public class InputReader {
         return sum;
     }
 
-    private static boolean locallyPrecedesOrSame(int e, int f) {
+    private boolean locallyPrecedesOrSame(int e, int f) {
         for (int i = 0; i < trace.size(); i++) {
             List<Integer> localTrace = trace.get(i);
             boolean foundE = false;
@@ -106,7 +123,7 @@ public class InputReader {
         return false;
     }
 
-    private static int getNext(int evtID) {
+    private int getNext(int evtID) {
         for (int i = 0; i < trace.size(); i++) {
             List<Integer> localTrace = trace.get(i);
             for (int j = 0; j < localTrace.size(); j++) {
@@ -118,7 +135,7 @@ public class InputReader {
         return -1;
     }
 
-    private static int getPrev(int evtID) {
+    private int getPrev(int evtID) {
         for (int i = 0; i < trace.size(); i++) {
             List<Integer> localTrace = trace.get(i);
             for (int j = 0; j < localTrace.size(); j++) {
@@ -130,7 +147,7 @@ public class InputReader {
         return -1;
     }
 
-    private static boolean happensBefore(int e, int f) {
+    private boolean happensBefore(int e, int f) {
         if (f == -1) {
             return false;
         }

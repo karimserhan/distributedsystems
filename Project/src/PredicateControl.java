@@ -5,7 +5,10 @@
 import java.util.*;
 public class PredicateControl {
 
-    public ArrayList<Integer> getShortestSequence (ArrayList<Integer> initialEvents, ArrayList<Integer> finalEvents, boolean [][] adjacencyMatrix)
+    public static ArrayList<Integer> getShortestSequence(
+            List<Integer> initialEvents,
+            List<Integer> finalEvents,
+            boolean [][] adjacencyMatrix)
     {
         int numberOfEvents = adjacencyMatrix.length;
         int[][] pairwiseShortestPath = new int[numberOfEvents][numberOfEvents];
