@@ -27,6 +27,9 @@ public class InputReader {
         String line = reader.readLine();
         // read the lines that contain the list of events on each processor
         while (line != null) {
+            if (line.trim().equals("")) {
+                continue;
+            }
             if (line.charAt(0) != 'P') {
                 break;
             }
@@ -75,7 +78,7 @@ public class InputReader {
             for (int f = 0; f < n; f++) {
                 if (trueEvents.contains(e) && trueEvents.contains(f)) {
                     int e_next = getNext(e);
-                    graph[e][f] = !happensBefore(e_next, f);
+                    graph[e][f] = e_next == -1 || !happensBefore(e_next, f);
                 }
                 if (!trueEvents.contains(e)) { isolateNode(graph, e); }
                 if (!trueEvents.contains(f)) { isolateNode(graph, f); }
@@ -108,15 +111,13 @@ public class InputReader {
         return sum;
     }
 
-    private boolean locallyPrecedesOrSame(int e, int f) {
+    private boolean locallyPrecedes(int e, int f) {
         for (int i = 0; i < trace.size(); i++) {
             List<Integer> localTrace = trace.get(i);
             boolean foundE = false;
             for (int j = 0; j < localTrace.size(); j++) {
+                if (localTrace.get(j) == f) { return foundE; }
                 if (localTrace.get(j) == e) { foundE = true; }
-                if (localTrace.get(j) == f) {
-                    return foundE;
-                }
             }
             if (foundE) { return false; }
         }
@@ -152,7 +153,7 @@ public class InputReader {
             return false;
         }
 
-        if (locallyPrecedesOrSame(e, f)) {
+        if (e == f || locallyPrecedes(e, f)) {
             return true;
         }
         int localPrev = getPrev(f);

@@ -46,14 +46,15 @@ public class FloydWarshall {
             {
                 for(int j=0; j<numberOfEvents; j++)
                 {
-                    if(minimumPairwiseDistances[i][j] > minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j]) {
-                        minimumPairwiseDistances[i][j] = minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j];
-                        nextHopEvents[i][j] = nextHopEvents[i][k];
+                    if (nextHopEvents[i][k] != -1 && nextHopEvents[k][j] != -1) {
+                        if (minimumPairwiseDistances[i][j] > minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j]) {
+                            minimumPairwiseDistances[i][j] = minimumPairwiseDistances[i][k] + minimumPairwiseDistances[k][j];
+                            nextHopEvents[i][j] = nextHopEvents[i][k];
+                        }
                     }
                 }
             }
         }
-
     }
 
 
