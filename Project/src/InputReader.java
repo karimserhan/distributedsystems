@@ -97,11 +97,11 @@ public class InputReader {
             boolean foundE = false;
             for (int j = 0; j < localTrace.size(); j++) {
                 if (localTrace.get(j) == e) { foundE = true; }
-                if (localTrace.get(j) == f && foundE) {
-                    return true;
+                if (localTrace.get(j) == f) {
+                    return foundE;
                 }
             }
-            if (!foundE) { return false; }
+            if (foundE) { return false; }
         }
         return false;
     }
@@ -143,7 +143,7 @@ public class InputReader {
         if (messages.containsKey(f)) { remotePrevs = messages.get(f); }
 
         if (happensBefore(e, localPrev)) { return true; }
-        
+
         for (int remotePrev : remotePrevs){
             if (happensBefore(e, remotePrev)) {
                 return true;

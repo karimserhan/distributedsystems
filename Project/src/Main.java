@@ -2,9 +2,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by Karim-pc1 on 11/20/2015.
- */
 public class Main {
    public static void main(String[] args) {
        HashMap<Integer, List<Integer>> map = new HashMap<>();
