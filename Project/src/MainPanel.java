@@ -70,6 +70,7 @@ public class MainPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+
         }
     }
 
@@ -161,17 +162,10 @@ public class MainPanel extends JPanel {
         g2.drawLine(x1, y1, x2, y2);
     }
 
-    public static void createAndShowUI() {
-        try {
-            TraceGenerator generator = new TraceGenerator(2, 4, 4, 5, 2, 2);
-            generator.generatreTraceFile("trace.txt");
-        } catch (FileNotFoundException e) {
-            System.out.println("Error writing to file");
-        }
-
+    public static void createAndShowUI(String fileName) {
         JDialog dialog = new JDialog(new JFrame(), "Trace");
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        MainPanel panel = generatePanel("trace.txt");
+        MainPanel panel = generatePanel(fileName);
         dialog.add(panel);
         dialog.pack();
         dialog.setLocationByPlatform(true);
@@ -181,7 +175,7 @@ public class MainPanel extends JPanel {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                createAndShowUI();
+                createAndShowUI("hello");
             }
         });
     }

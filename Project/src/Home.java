@@ -1,17 +1,9 @@
-import com.sun.tools.javac.comp.Flow;
-import javafx.scene.control.ComboBox;
-
 import javax.swing.*;
-
-/**
- * Created by egantoun on 11/21/15.
- */
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 
 public class Home extends JFrame implements ActionListener {
 
@@ -29,14 +21,15 @@ public class Home extends JFrame implements ActionListener {
     public JTextField minNumberOfMsgs;
     public JLabel maxMsgText;
     public JTextField maxNumberOfMsgs;
+    public JButton generateButton;
 
     public JFileChooser chooser;
 
     public Home() {
-        Initialize();
+        initialize();
     }
 
-    public void Initialize() {
+    public void initialize() {
         setBounds(30, 30, 300, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -46,14 +39,13 @@ public class Home extends JFrame implements ActionListener {
         welcomeText = new JLabel("Java Predicate Control", JLabel.CENTER);
         c.gridy = 1;
         c.gridx = 1;
-        getContentPane().add(welcomeText,c);
+        getContentPane().add(welcomeText, c);
 
         String[] comboBoxItems = new String[]{"Random Trace", "Trace from File"};
         c.gridx = 1;
         c.gridy =2;
         menu = new JComboBox(comboBoxItems);
         getContentPane().add(menu,c);
-
 
         //Random Menu
         c.anchor = GridBagConstraints.WEST;
@@ -91,7 +83,7 @@ public class Home extends JFrame implements ActionListener {
         getContentPane().add(minNumberOfEvents, c);
 
         //Maximum Number of Events
-        maxProcessEventst = new JLabel("Minimum Number of Events");
+        maxProcessEventst = new JLabel("Maximum Number of Events");
         c.gridx =1;
         c.gridy =6;
         getContentPane().add(maxProcessEventst, c);
@@ -102,7 +94,7 @@ public class Home extends JFrame implements ActionListener {
         getContentPane().add(maxNumberOfEvents, c);
 
         //Minimum Number of Messages
-        minMsgText = new JLabel("Minimum Number of Events");
+        minMsgText = new JLabel("Minimum Number of Messages");
         c.gridx =1;
         c.gridy =7;
         getContentPane().add(minMsgText, c);
@@ -113,7 +105,7 @@ public class Home extends JFrame implements ActionListener {
         getContentPane().add(minNumberOfMsgs, c);
 
         //Maximum Number of Events
-        maxMsgText = new JLabel("Minimum Number of Events");
+        maxMsgText = new JLabel("Maximum Number of Messages");
         c.gridx =1;
         c.gridy =8;
         getContentPane().add(maxMsgText, c);
@@ -123,22 +115,58 @@ public class Home extends JFrame implements ActionListener {
         c.gridy=8;
         getContentPane().add(maxNumberOfMsgs, c);
 
+        generateButton = new JButton("Generate random trace");
+        c.gridx = 1;
+        c.gridy = 9;
+        getContentPane().add(generateButton, c);
 
+        ((PlainDocument)minNumberOfProcesses.getDocument()).setDocumentFilter(new MyIntFilter());
+        ((PlainDocument)maxNumberOfProcesses.getDocument()).setDocumentFilter(new MyIntFilter());
+        ((PlainDocument)minNumberOfEvents.getDocument()).setDocumentFilter(new MyIntFilter());
+        ((PlainDocument)maxNumberOfEvents.getDocument()).setDocumentFilter(new MyIntFilter());
+        ((PlainDocument)minNumberOfMsgs.getDocument()).setDocumentFilter(new MyIntFilter());
+        ((PlainDocument)maxNumberOfMsgs.getDocument()).setDocumentFilter(new MyIntFilter());
+
+        final JFrame thisFrame = this;
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int[] vals = null;//getRandomParams();
+                    if (vals == null) {
+                        JOptionPane.showMessageDialog(thisFrame, "Please fill out all of the fields with positive numbers",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    TraceGenerator generator = new TraceGenerator(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
+                    generator.generatreTraceFile("random_trace.txt");
+                    MainPanel.createAndShowUI("random_trace.txt");
+                } catch (FileNotFoundException exp) {
+                    JOptionPane.showMessageDialog(thisFrame, "Unexpected error occured",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error writing to file");
+                }
+            }
+        });
 
         menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
                 if(menu.getSelectedIndex() ==1)
                 {
-                    hideRandomItems();
+                    enableRandomItems(false);
                     chooser = new JFileChooser();
                     //FileNameExtensionFilter filter = new FileNameExtensionFilter("txt");
                     //chooser.setFileFilter(filter);
                     int returnVal = chooser.showOpenDialog(getParent());
                     if(returnVal == JFileChooser.APPROVE_OPTION) {
-                        System.out.println("You chose to open this file: " +
-                                chooser.getSelectedFile().getName());
+                        MainPanel.createAndShowUI(chooser.getSelectedFile().getAbsolutePath());
+                    } else {
+                        menu.setSelectedIndex(0);
+                        enableRandomItems(true);
                     }
+                } else {
+                    enableRandomItems(true);
                 }
 
                 if(menu.getSelectedIndex() ==0)
@@ -149,26 +177,23 @@ public class Home extends JFrame implements ActionListener {
 
             }
         });
-
-
-
     }
 
-    public void hideRandomItems()
+    public void enableRandomItems(boolean enabled)
     {
-
-         minProcessText.setVisible(false);
-         minNumberOfProcesses.setVisible(false);
-         maxProcessText.setVisible(false);
-         maxNumberOfProcesses.setVisible(false);
-         minProcessEventst.setVisible(false);
-         minNumberOfEvents.setVisible(false);
-         maxProcessEventst.setVisible(false);
-         maxNumberOfEvents.setVisible(false);
-         minMsgText.setVisible(false);
-         minNumberOfMsgs.setVisible(false);
-         maxMsgText.setVisible(false);
-         maxNumberOfMsgs.setVisible(false);
+         minProcessText.setEnabled(enabled);
+         minNumberOfProcesses.setEnabled(enabled);
+         maxProcessText.setEnabled(enabled);
+         maxNumberOfProcesses.setEnabled(enabled);
+         minProcessEventst.setEnabled(enabled);
+         minNumberOfEvents.setEnabled(enabled);
+         maxProcessEventst.setEnabled(enabled);
+         maxNumberOfEvents.setEnabled(enabled);
+         minMsgText.setEnabled(enabled);
+         minNumberOfMsgs.setEnabled(enabled);
+         maxMsgText.setEnabled(enabled);
+         maxNumberOfMsgs.setEnabled(enabled);
+        generateButton.setEnabled(enabled);
     }
 
     public void showRandomItems()
@@ -202,6 +227,65 @@ public class Home extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         System.out.println("Test");
+
+    }
+}
+
+class MyIntFilter extends DocumentFilter {
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string,
+                             AttributeSet attr) throws BadLocationException {
+
+        Document doc = fb.getDocument();
+        StringBuilder sb = new StringBuilder();
+        sb.append(doc.getText(0, doc.getLength()));
+        sb.insert(offset, string);
+
+        if (test(sb.toString())) {
+            super.insertString(fb, offset, string, attr);
+        } else {
+            // warn the user and don't allow the insert
+        }
+    }
+
+    private boolean test(String text) {
+        try {
+            if (text.equals("")) { return true; }
+            int x = Integer.parseInt(text);
+            return x >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text,
+                        AttributeSet attrs) throws BadLocationException {
+
+        Document doc = fb.getDocument();
+        StringBuilder sb = new StringBuilder();
+        sb.append(doc.getText(0, doc.getLength()));
+        sb.replace(offset, offset + length, text);
+
+        if (test(sb.toString())) {
+            super.replace(fb, offset, length, text, attrs);
+        } else {
+            // warn the user and don't allow the insert
+        }
+    }
+
+    @Override
+    public void remove(DocumentFilter.FilterBypass fb, int offset, int length)
+            throws BadLocationException {
+        Document doc = fb.getDocument();
+        StringBuilder sb = new StringBuilder();
+        sb.append(doc.getText(0, doc.getLength()));
+        sb.delete(offset, offset + length);
+
+        if (test(sb.toString())) {
+            super.remove(fb, offset, length);
+        } else {// warn the user and don't allow the insert
+        }
 
     }
 }
