@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,8 +50,8 @@ public class MainPanel extends JPanel {
 
             // get the object model
             boolean[][] trueEvtGraph = traceReader.getGraph();
-            List<Integer> trueInitials = traceReader.getInitialTrueStates();
-            List<Integer> trueFinals = traceReader.getFinalTrueStates();
+            List<Integer> trueInitials = traceReader.getInitialTrueEvents();
+            List<Integer> trueFinals = traceReader.getFinalTrueEvents();
 
             // call algorithm
             ArrayList<Integer> shortestSequence = PredicateControl

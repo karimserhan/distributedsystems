@@ -92,11 +92,11 @@ public class TraceReader {
         return graph;
     }
 
-    public List<Integer> getInitialTrueStates() {
+    public List<Integer> getInitialTrueEvents() {
         return trueInitials;
     }
     
-    public List<Integer> getFinalTrueStates() {
+    public List<Integer> getFinalTrueEvents() {
         return trueFinals;
     }
 
