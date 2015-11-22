@@ -30,6 +30,7 @@ public class Home extends JFrame implements ActionListener {
     }
 
     public void initialize() {
+        setResizable(false);
         setBounds(30, 30, 300, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -140,7 +141,7 @@ public class Home extends JFrame implements ActionListener {
                     }
                     TraceGenerator generator = new TraceGenerator(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
                     generator.generatreTraceFile("random_trace.txt");
-                    MainPanel.createAndShowUI("random_trace.txt");
+                    MainPanel.createAndShowUI(thisFrame, "random_trace.txt");
                 } catch (FileNotFoundException exp) {
                     JOptionPane.showMessageDialog(thisFrame, "Unexpected error occured",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -160,11 +161,11 @@ public class Home extends JFrame implements ActionListener {
                     //chooser.setFileFilter(filter);
                     int returnVal = chooser.showOpenDialog(getParent());
                     if(returnVal == JFileChooser.APPROVE_OPTION) {
-                        MainPanel.createAndShowUI(chooser.getSelectedFile().getAbsolutePath());
-                    } else {
-                        menu.setSelectedIndex(0);
-                        enableRandomItems(true);
+                        MainPanel.createAndShowUI(thisFrame,
+                                chooser.getSelectedFile().getAbsolutePath());
                     }
+                    menu.setSelectedIndex(0);
+                    enableRandomItems(true);
                 } else {
                     enableRandomItems(true);
                 }
