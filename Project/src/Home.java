@@ -170,7 +170,7 @@ public class Home extends JFrame implements ActionListener {
                     enableRandomItems(true);
                 }
 
-                if(menu.getSelectedIndex() ==0)
+                if (menu.getSelectedIndex() ==0)
                 {
                     chooser.setVisible(false);
                 }
