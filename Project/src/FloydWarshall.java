@@ -74,7 +74,5 @@ public class FloydWarshall {
         }
 
         return resultPath;
-
     }
-
 }

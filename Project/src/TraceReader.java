@@ -11,6 +11,7 @@ public class TraceReader {
     private List<Integer> trueEvents;
     private List<Integer> trueInitials;
     private List<Integer> trueFinals;
+    private HashMap<Integer, Event> eventDetails;
 
     public TraceReader() {
         trace = new LinkedList<>();
@@ -18,6 +19,7 @@ public class TraceReader {
         trueEvents = new LinkedList<>();
         trueInitials = new LinkedList<>();
         trueFinals = new LinkedList<>();
+        eventDetails = new HashMap<>();
     }
 
     public void readTrace(String fileName) throws
@@ -49,6 +51,7 @@ public class TraceReader {
                     if (i == eventArr.length-1) { trueFinals.add(eventID); }
                 }
                 localTrace.add(eventID);
+                eventDetails.put(eventID, new Event(eventID, processID, predicateAsStr.equals("T")));
             }
             trace.add(localTrace);
             line = reader.readLine();
@@ -66,6 +69,7 @@ public class TraceReader {
                 evtList.add(sendEvt);
                 messages.put(rcvEvt, evtList);
             }
+            eventDetails.get(rcvEvt).addIncomingEvent(sendEvt);
             line = reader.readLine();
         }
     }
@@ -93,6 +97,10 @@ public class TraceReader {
     
     public List<Integer> getFinalTrueStates() {
         return trueFinals;
+    }
+
+    public HashMap<Integer, Event> getEventDetails() {
+        return eventDetails;
     }
 
     private void isolateNode(boolean[][] graph, int e) {
@@ -169,5 +177,13 @@ public class TraceReader {
         }
 
         return false;
+    }
+
+    public HashMap<Integer,List<Integer>> getMessages() {
+        return messages;
+    }
+
+    public List<List<Integer>> getTrace() {
+        return trace;
     }
 }
