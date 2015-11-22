@@ -132,7 +132,7 @@ public class Home extends JFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    int[] vals = null;//getRandomParams();
+                    int[] vals = getRandomParams();
                     if (vals == null) {
                         JOptionPane.showMessageDialog(thisFrame, "Please fill out all of the fields with positive numbers",
                                 "Error", JOptionPane.ERROR_MESSAGE);
@@ -171,7 +171,6 @@ public class Home extends JFrame implements ActionListener {
 
                 if(menu.getSelectedIndex() ==0)
                 {
-                    showRandomItems();
                     chooser.setVisible(false);
                 }
 
@@ -196,23 +195,6 @@ public class Home extends JFrame implements ActionListener {
         generateButton.setEnabled(enabled);
     }
 
-    public void showRandomItems()
-    {
-        minProcessText.setVisible(true);
-        minNumberOfProcesses.setVisible(true);
-        maxProcessText.setVisible(true);
-        maxNumberOfProcesses.setVisible(true);
-        minProcessEventst.setVisible(true);
-        minNumberOfEvents.setVisible(true);
-        maxProcessEventst.setVisible(true);
-        maxNumberOfEvents.setVisible(true);
-        minMsgText.setVisible(true);
-        minNumberOfMsgs.setVisible(true);
-        maxMsgText.setVisible(true);
-        maxNumberOfMsgs.setVisible(true);
-    }
-
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -222,6 +204,20 @@ public class Home extends JFrame implements ActionListener {
         });
     }
 
+    public int[] getRandomParams() {
+        try {
+            int[] fields = new int[6];
+            fields[0] = Integer.parseInt(minNumberOfProcesses.getText());
+            fields[1] = Integer.parseInt(maxNumberOfProcesses.getText());
+            fields[2] = Integer.parseInt(minNumberOfEvents.getText());
+            fields[3] = Integer.parseInt(maxNumberOfEvents.getText());
+            fields[4] = Integer.parseInt(minNumberOfMsgs.getText());
+            fields[5] = Integer.parseInt(maxNumberOfMsgs.getText());
+            return fields;
+        } catch (NumberFormatException exp) {
+            return null;
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
