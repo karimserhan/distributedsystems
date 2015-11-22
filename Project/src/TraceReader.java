@@ -59,6 +59,7 @@ public class TraceReader {
 
         // read the lines that contain the message information
         while (line != null) {
+            if (line.equals("")) {continue;}
             String[] evts = line.split(",");
             int sendEvt = Integer.parseInt(evts[0].trim());
             int rcvEvt = Integer.parseInt(evts[1].trim());

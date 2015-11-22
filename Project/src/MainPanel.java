@@ -131,10 +131,30 @@ public class MainPanel extends JPanel {
         }
 
         if (syncSequence != null) {
+            for (int i = 0; i < syncSequence.size(); i++) {
+                for (int j = i+1; j < syncSequence.size(); j++) {
+                    drawMessage(g, syncSequence.get(i), syncSequence.get(j), Color.RED);
+                }
+            }
+
             for (int i = 1; i < syncSequence.size(); i++) {
-                drawMessage(g, syncSequence.get(i - 1), syncSequence.get(i), Color.RED);
+                int s = syncSequence.get(i);
+                int r = getNextLocalEvent(syncSequence.get(i-1));
+                if (r != -1) { drawMessage(g, s, r, Color.RED); }
             }
         }
+    }
+
+    private int getNextLocalEvent(int e) {
+        Event evt = eventDetails.get(e);
+        List<Integer> localTrace = trace.get(evt.getPid());
+        for (int i = 0; i < localTrace.size(); i++) {
+            if (localTrace.get(i) == e) {
+                if (i != localTrace.size()-1) { return localTrace.get(i+1); }
+                else { return -1; }
+            }
+        }
+        return -1;
     }
 
     private void drawMessage(Graphics g, int e, int f, Color color) {
@@ -143,6 +163,10 @@ public class MainPanel extends JPanel {
         g2.setStroke(new BasicStroke(defaultStroke));
         Event sendEvt = eventDetails.get(e);
         Event recvEvt = eventDetails.get(f);
+        if (sendEvt.getPid() == recvEvt.getPid()) {
+            return;
+        }
+
         int x1 = sendEvt.getXCoord();
         int y1 = sendEvt.getYCoord();
         int x2 = recvEvt.getXCoord();
@@ -162,21 +186,14 @@ public class MainPanel extends JPanel {
         g2.drawLine(x1, y1, x2, y2);
     }
 
-    public static void createAndShowUI(String fileName) {
-        JDialog dialog = new JDialog(new JFrame(), "Trace");
+    public static void createAndShowUI(JFrame frame, String fileName) {
+        JDialog dialog = new JDialog(frame, "Trace");
+        dialog.setModal(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         MainPanel panel = generatePanel(fileName);
         dialog.add(panel);
         dialog.pack();
         dialog.setLocationByPlatform(true);
         dialog.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowUI("hello");
-            }
-        });
     }
 }
